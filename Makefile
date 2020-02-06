@@ -671,7 +671,7 @@ FUZZ_OBJS += fuzz-pack-headers.o
 FUZZ_OBJS += fuzz-pack-idx.o
 
 # Always build fuzz objects even if not testing, to prevent bit-rot.
-all:: $(FUZZ_OBJS)
+all_killed:: $(FUZZ_OBJS)
 
 FUZZ_PROGRAMS += $(patsubst %.o,%,$(FUZZ_OBJS))
 
@@ -2043,10 +2043,19 @@ export DIFF TAR INSTALL DESTDIR SHELL_PATH
 
 SHELL = $(SHELL_PATH)
 
-all:: shell_compatibility_test
+VSPATHCMD = "C:/Program Files (x86)/Microsoft Visual Studio/Installer/vswhere.exe" -latest -prerelease -property installationPath
+
+all::
+	export vspath=`"C:/Program Files (x86)/Microsoft Visual Studio/Installer/vswhere.exe" -latest -prerelease -property installationPath` ; \
+	"$$COMSPEC" /c "\"$$vspath\\Common7\tools\VsDevCmd.bat\" && msbuild git.sln /p:Platform=ARM64,Configuration=Release"
+
+#	"$(ProgramFiles(x86))/Microsoft Visual Studio/Installer/vswhere.exe" -latest -prerelease -property installationPath
+#	"C:/Program Files (x86)/Microsoft Visual Studio/Installer/vswhere.exe" -latest -prerelease -property installationPath
+
+all_killed:: shell_compatibility_test
 
 ifeq "$(PROFILE)" "BUILD"
-all:: profile
+all_killed:: profile
 endif
 
 profile:: profile-clean
@@ -2065,12 +2074,12 @@ profile-fast: profile-clean
 	$(MAKE) PROFILE=USE all
 
 
-all:: $(ALL_PROGRAMS) $(SCRIPT_LIB) $(BUILT_INS) $(OTHER_PROGRAMS) GIT-BUILD-OPTIONS
+all_killed:: $(ALL_PROGRAMS) $(SCRIPT_LIB) $(BUILT_INS) $(OTHER_PROGRAMS) GIT-BUILD-OPTIONS
 ifneq (,$X)
 	$(QUIET_BUILT_IN)$(foreach p,$(patsubst %$X,%,$(filter %$X,$(ALL_PROGRAMS) $(BUILT_INS) git$X)), test -d '$p' -o '$p' -ef '$p$X' || $(RM) '$p';)
 endif
 
-all::
+all_killed::
 ifndef NO_TCLTK
 	$(QUIET_SUBDIR0)git-gui $(QUIET_SUBDIR1) gitexecdir='$(gitexec_instdir_SQ)' all
 	$(QUIET_SUBDIR0)gitk-git $(QUIET_SUBDIR1) all
@@ -2124,9 +2133,9 @@ git.sp git.s git.o: EXTRA_CPPFLAGS = \
 	'-DGIT_MAN_PATH="$(mandir_relative_SQ)"' \
 	'-DGIT_INFO_PATH="$(infodir_relative_SQ)"'
 
-git$X: git.o GIT-LDFLAGS $(BUILTIN_OBJS) $(GITLIBS)
-	$(QUIET_LINK)$(CC) $(ALL_CFLAGS) -o $@ $(ALL_LDFLAGS) \
-		$(filter %.o,$^) $(LIBS)
+#git$X: git.o GIT-LDFLAGS $(BUILTIN_OBJS) $(GITLIBS)
+#	$(QUIET_LINK)$(CC) $(ALL_CFLAGS) -o $@ $(ALL_LDFLAGS) \
+#		$(filter %.o,$^) $(LIBS)
 
 help.sp help.s help.o: command-list.h
 
@@ -2380,13 +2389,13 @@ C_OBJ := $(filter-out $(ASM_OBJ),$(OBJECTS))
 
 .SUFFIXES:
 
-$(C_OBJ): %.o: %.c GIT-CFLAGS $(missing_dep_dirs)
-	$(QUIET_CC)$(CC) -o $*.o -c $(dep_args) $(ALL_CFLAGS) $(EXTRA_CPPFLAGS) $<
-$(ASM_OBJ): %.o: %.S GIT-CFLAGS $(missing_dep_dirs)
-	$(QUIET_CC)$(CC) -o $*.o -c $(dep_args) $(ALL_CFLAGS) $(EXTRA_CPPFLAGS) $<
+#$(C_OBJ): %.o: %.c GIT-CFLAGS $(missing_dep_dirs)
+#	$(QUIET_CC)$(CC) -o $*.o -c $(dep_args) $(ALL_CFLAGS) $(EXTRA_CPPFLAGS) $<
+#$(ASM_OBJ): %.o: %.S GIT-CFLAGS $(missing_dep_dirs)
+#	$(QUIET_CC)$(CC) -o $*.o -c $(dep_args) $(ALL_CFLAGS) $(EXTRA_CPPFLAGS) $<
 
-%.s: %.c GIT-CFLAGS FORCE
-	$(QUIET_CC)$(CC) -o $@ -S $(ALL_CFLAGS) $(EXTRA_CPPFLAGS) $<
+#%.s: %.c GIT-CFLAGS FORCE
+#	$(QUIET_CC)$(CC) -o $@ -S $(ALL_CFLAGS) $(EXTRA_CPPFLAGS) $<
 
 ifdef USE_COMPUTED_HEADER_DEPENDENCIES
 # Take advantage of gcc's on-the-fly dependency generation
@@ -2574,7 +2583,7 @@ POFILES := $(wildcard po/*.po)
 MOFILES := $(patsubst po/%.po,po/build/locale/%/LC_MESSAGES/git.mo,$(POFILES))
 
 ifndef NO_GETTEXT
-all:: $(MOFILES)
+all_killed:: $(MOFILES)
 endif
 
 po/build/locale/%/LC_MESSAGES/git.mo: po/%.po
@@ -2586,9 +2595,9 @@ LIB_CPAN := $(wildcard perl/FromCPAN/*.pm perl/FromCPAN/*/*.pm)
 LIB_CPAN_GEN := $(patsubst perl/%.pm,perl/build/lib/%.pm,$(LIB_CPAN))
 
 ifndef NO_PERL
-all:: $(LIB_PERL_GEN)
+all_killed:: $(LIB_PERL_GEN)
 ifndef NO_PERL_CPAN_FALLBACKS
-all:: $(LIB_CPAN_GEN)
+all_killed:: $(LIB_CPAN_GEN)
 endif
 NO_PERL_CPAN_FALLBACKS_SQ = $(subst ','\'',$(NO_PERL_CPAN_FALLBACKS))
 endif
@@ -2734,7 +2743,7 @@ endif
 
 test_bindir_programs := $(patsubst %,bin-wrappers/%,$(BINDIR_PROGRAMS_NEED_X) $(BINDIR_PROGRAMS_NO_X) $(TEST_PROGRAMS_NEED_X))
 
-all:: $(TEST_PROGRAMS) $(test_bindir_programs)
+all_killed:: $(TEST_PROGRAMS) $(test_bindir_programs)
 
 bin-wrappers/%: wrap-for-bin.sh
 	@mkdir -p bin-wrappers
