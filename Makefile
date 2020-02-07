@@ -2892,6 +2892,13 @@ install: all
 	$(INSTALL) $(ALL_PROGRAMS) '$(DESTDIR_SQ)$(gitexec_instdir_SQ)'
 	$(INSTALL) -m 644 $(SCRIPT_LIB) '$(DESTDIR_SQ)$(gitexec_instdir_SQ)'
 	$(INSTALL) $(install_bindir_programs) '$(DESTDIR_SQ)$(bindir_SQ)'
+	$(INSTALL) vcruntime140.dll '$(DESTDIR_SQ)$(bindir_SQ)'
+	$(INSTALL) libcharset.dll '$(DESTDIR_SQ)$(bindir_SQ)'
+	$(INSTALL) libcurl.dll '$(DESTDIR_SQ)$(bindir_SQ)'
+	$(INSTALL) libcrypto-1_1-arm64.dll '$(DESTDIR_SQ)$(bindir_SQ)'
+	$(INSTALL) libiconv.dll '$(DESTDIR_SQ)$(bindir_SQ)'
+	$(INSTALL) libssl-1_1-arm64.dll '$(DESTDIR_SQ)$(bindir_SQ)'
+	$(INSTALL) zlib1.dll '$(DESTDIR_SQ)$(bindir_SQ)'
 ifdef MSVC
 	# We DO NOT install the individual foo.o.pdb files because they
 	# have already been rolled up into the exe's pdb file.
